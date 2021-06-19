@@ -5,6 +5,6 @@ import { EntrypointUpdate } from './entrypoint.update';
 
 @Module({
 	providers: [EntrypointUpdate],
-	imports: [UsersModule, GitlabModule]
+	imports: [UsersModule, GitlabModule],
 })
-export class EntrypointModule { }
+export class EntrypointModule {}

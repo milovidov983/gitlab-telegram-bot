@@ -1,4 +1,3 @@
-
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { BASE_GITLAB_URL } from '../../config/constants';
@@ -12,7 +11,9 @@ export class GitlabConnectorService {
 	constructor(@Inject(GITLAB_CONNECTOR_OPTIONS) options: GitlabConnectorModuleOptions) {
 		this.baseUrl = 'https://' + options.baseUrl;
 		if (!this.baseUrl) {
-			throw new Error('Init error. Please set the base gitlab url in .env file: ' + BASE_GITLAB_URL);
+			throw new Error(
+				'Init error. Please set the base gitlab url in .env file: ' + BASE_GITLAB_URL
+			);
 		}
 	}
 

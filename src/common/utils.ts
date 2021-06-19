@@ -3,6 +3,6 @@ export function createErrorLogMessage(message: string, data: any, error: any) {
 		errorMessage: message,
 		callStack: error?.stack,
 		exception: error,
-		data: { ...data }
-	}
+		data: { ...data },
+	};
 }

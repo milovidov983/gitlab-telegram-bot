@@ -7,30 +7,38 @@ import { User } from './users.models';
 
 @Injectable()
 export class UsersService {
+	updateLastActivity(userId: number) {
+		throw new Error('Method not implemented.');
+	}
 	private readonly logger = new Logger(UsersService.name);
-	constructor(private readonly storage: UserDatabaseService) { }
+	constructor(private readonly storage: UserDatabaseService) {}
 
 	async create(user: Partial<User>): Promise<Result<void>> {
 		try {
 			await this.storage.save(new UserEntity(user));
 			return {};
 		} catch (err) {
-			const logMessage = createErrorLogMessage(`Error to create new user`, { user }, err)
+			const logMessage = createErrorLogMessage(
+				`Error to create new user`,
+				{ user },
+				err
+			);
 			this.logger.error(logMessage);
 		}
 		return { hasError: true };
 	}
 
-	async findUserByTelegramId(id: number): Promise<Result<User>> {
+	async findUserByTelegramId(id?: number): Promise<Result<User>> {
 		try {
+			if (!id) {
+				return { hasError: true };
+			}
 			const userOrNull = await this.storage.getUserById(id);
 			return { result: userOrNull ? userOrNull.data : undefined };
 		} catch (err) {
-			const logMessage = createErrorLogMessage(`Error to find user`, { id }, err)
+			const logMessage = createErrorLogMessage(`Error to find user`, { id }, err);
 			this.logger.error(logMessage);
 		}
 		return { hasError: true };
 	}
-
-
 }

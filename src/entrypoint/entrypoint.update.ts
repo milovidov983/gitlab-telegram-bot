@@ -12,38 +12,43 @@ export class EntrypointUpdate {
 		@InjectBot() private bot: Telegraf<ContextBot>,
 		private readonly usersService: UsersService,
 		private readonly gitlabService: GitlabService
-	) { }
+	) {}
 
 	@Start()
 	async startCommand(ctx: ContextBot): Promise<void> {
-		let message = 'def';
-		const userId = ctx.message?.from.id!;
-
+		let message = '';
+		const userId = ctx.message?.from.id;
+		if (!userId) {
+			return;
+		}
 		const findedUserResult = await this.usersService.findUserByTelegramId(userId);
 
 		if (findedUserResult.hasError) {
-			message = 'An error has occurred we are already working on this issue'
+			message = 'An error has occurred we are already working on this issue';
 		} else if (findedUserResult.result) {
 			const user = findedUserResult.result;
 			const isGitlabOnline = await this.gitlabService.isOnline(user);
 			if (!isGitlabOnline) {
-				message = user.role == 'guest'
-					? 'An error has occurred we are already working on this issue'
-					: 'Gitlab is offline. Contact your administrator.'
+				message =
+					user.role == 'guest'
+						? 'An error has occurred we are already working on this issue'
+						: 'Gitlab is offline. Contact your administrator.';
 			} else {
-				const isCorrectGitlabToken = await this.gitlabService.isCorrectToken(user);
+				const isCorrectGitlabToken = await this.gitlabService.isCorrcectToken(user);
 				if (isCorrectGitlabToken) {
 					message = `Hello ${user.gitlab?.userName}, good to see you again!`;
 				}
 			}
-			await this.usersService.updateLastActivity(userId);
+			
 		} else {
-			message = 'I have registered you, as soon as the administrator grants you access, '
-				+ 'I will inform you immediately';
+			message =
+				'I have registered you, as soon as the administrator grants you access, ' +
+				'I will inform you immediately';
 			const user = this.createUserFromContext(ctx);
-			await this.usersService.create(user);
+			if(user){
+				await this.usersService.create(user);
+			}
 		}
-
 
 		/*
 		1. try find user 
@@ -74,14 +79,16 @@ export class EntrypointUpdate {
 		await ctx.reply(message);
 	}
 
-	private createUserFromContext(ctx: ContextBot): Partial<User> {
-		return {
-			telegram: {
-				chatId: ctx.message?.chat.id,
-				id: ctx.message?.from.id!,
-				firstName: ctx.message?.from.first_name,
-				userName: ctx.message?.from.username,
-			}
+	private createUserFromContext(ctx: ContextBot): Partial<User | undefined> {
+		if(ctx.message?.from?.id){
+			return {
+				telegram: {
+					chatId: ctx.message?.chat.id,
+					id: ctx.message?.from.id,
+					firstName: ctx.message?.from.first_name,
+					userName: ctx.message?.from.username,
+				},
+			};
 		}
 	}
 }

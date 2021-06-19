@@ -1,13 +1,7 @@
-
-
-
-
-
 export type Result<T> = {
 	result?: T;
 	hasError?: boolean;
-}
-
+};
 
 // type ExtractPII<Type> = {
 // 	[Property in keyof Type]: Type[Property] extends { hasError: true } ? true : false

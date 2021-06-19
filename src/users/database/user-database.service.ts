@@ -9,7 +9,7 @@ export class UserDatabaseService {
 	constructor(
 		@InjectRepository(UserEntity)
 		private readonly userRepository: Repository<UserEntity>
-	) { }
+	) {}
 
 	async save(userEntity: UserEntity): Promise<UserEntity> {
 		const result = await this.userRepository.save(userEntity);

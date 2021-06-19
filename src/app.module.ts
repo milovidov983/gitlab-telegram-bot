@@ -9,17 +9,17 @@ import { UsersModule } from './users/users.module';
 import { UserDatabaseModule } from './users/database/user-database.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    TelegrafModule.forRoot({
-      token: configService.getBotToken(),
-      include: [EntrypointModule],
-    }),
-    GitlabConnectorModule.forRoot({ baseUrl: configService.getGitlabBaseUrl() }),
-    EntrypointModule,
-    UserDatabaseModule,
-    GitlabModule,
-    UsersModule,
-  ]
+	imports: [
+		TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
+		TelegrafModule.forRoot({
+			token: configService.getBotToken(),
+			include: [EntrypointModule],
+		}),
+		GitlabConnectorModule.forRoot({ baseUrl: configService.getGitlabBaseUrl() }),
+		EntrypointModule,
+		UserDatabaseModule,
+		GitlabModule,
+		UsersModule,
+	],
 })
-export class AppModule { }
+export class AppModule {}

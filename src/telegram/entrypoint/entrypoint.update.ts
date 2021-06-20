@@ -1,6 +1,6 @@
 import { Logger, UseGuards } from '@nestjs/common';
 import { Start, Update, InjectBot, Help, Command } from 'nestjs-telegraf';
-import { logError } from '../../common/utils';
+import { getPastDateDefault, logError } from '../../common/utils';
 import { Telegraf } from 'telegraf';
 import { MessageCreateError } from '../../command-handlers/errors/message-create-error';
 import { RequestUserIdIsNotDefinedError } from '../../command-handlers/errors/request-user-id-not-defined';
@@ -10,8 +10,8 @@ import { ValidateContext } from '../decorators/validate-context.decorator';
 import { EntrypointService } from './entrypoint.service';
 import { AdminGuard } from '../../common/admin.guard';
 import { NotificationRawData } from '../../gitlab/gitlab.models';
-import { type } from 'os';
 import { EDIT_USERS_SCENE_ID, GITLAB_TOKEN_SCENE_ID } from './constants';
+import { UsersService } from '../../users/users.service';
 
 @Update()
 export class EntrypointUpdate {
@@ -21,6 +21,7 @@ export class EntrypointUpdate {
 	constructor(
 		@InjectBot() private bot: Telegraf<ContextBot>,
 		private readonly entrypointSerive: EntrypointService,
+		private readonly userService: UsersService
 	) {
 		this.isProd = configService.isProduction();
 	}
@@ -109,6 +110,16 @@ export class EntrypointUpdate {
 	@Command('token')
 	async enterGitlabToken(@ValidateContext() ctx: ContextBot) {
 		await ctx.scene.enter(GITLAB_TOKEN_SCENE_ID);
+	}
+
+
+	@Command('clear')
+	async clearTime(@ValidateContext() ctx: ContextBot) {
+		await this.userService.updateUser(ctx.from!.id, (user) => {
+			user.operation.syncHistoryByRole.assignee = getPastDateDefault();
+			user.operation.syncHistoryByRole.author = getPastDateDefault();
+		});
+		await ctx.reply('Ok');
 	}
 
 	private handleErrorAndLog(err: any, message: string, ctx: ContextBot) {

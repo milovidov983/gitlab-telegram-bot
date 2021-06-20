@@ -1,5 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { ContextBot } from '../telegram/common/context.interface';
+import { OperationData } from '../users/users.models';
+import { MergeRequestRole } from './shared.models';
 
 
 export function createErrorLogMessage(message: string, data: any, error: any) {
@@ -42,4 +44,12 @@ export function clearState(ctx: ContextBot): void {
 	if (ctx.session.__scenes.state) {
 		ctx.session.__scenes.state = {};
 	}
+}
+
+
+export function getLastSyncDateByRole(o: OperationData, role: MergeRequestRole): Date {
+	if (o.syncHistoryByRole) {
+		return new Date(o.syncHistoryByRole[role]);
+	}
+	return getPastDateDefault();
 }

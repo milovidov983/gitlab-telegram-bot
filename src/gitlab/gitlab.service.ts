@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../users/users.models';
 import { GitlabDatabaseService } from './database/gitlab-db.service';
 import { GitlabMergeRequestEntity } from './database/gitlab-mr.entity';
+import { GitlabUser } from './gitlab-connector/gitlab-connector.models';
 import { GitlabConnectorService } from './gitlab-connector/gitlab-connector.service';
 import { GitlabInternalUserModel, MergeRequest, MergeRequestId, MergeRequests } from './gitlab.models';
 
@@ -31,17 +32,17 @@ export class GitlabService {
 		};
 	}
 
-	async isTokenValid(token: string): Promise<boolean> {
+	async getUser(token: string): Promise<GitlabUser> {
 		const user = await this.connector.getUser(token);
-		return !!user;
+		return user;
 	}
 
 	//#region GITLAB USERS
 
 	public async getAllActiveUsers(users: User[]): Promise<GitlabInternalUserModel[]> {
 		const tokens = users
-			.filter(x => x.GitlabProfile.isTokenOk)
-			.map(x => x.GitlabProfile.token)
+			.filter(x => x.gitlab.isTokenOk)
+			.map(x => x.gitlab.token)
 			.filter(x => !!x);
 
 		const gitLabUsers: GitlabInternalUserModel[] = await this.connector.getUsers(tokens);

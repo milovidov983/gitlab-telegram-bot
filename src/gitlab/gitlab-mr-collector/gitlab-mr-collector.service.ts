@@ -92,10 +92,15 @@ export class GitlabMergeRequestCollectorService {
 		// они либо отсутсвуют, либо их статус изменился
 		const updateCollection = [] as NotificationRawData[];
 
+
+
 		for (const currentMergeRequest of mrs) {
+
+
+
 			// Проверяем кто является автором MR
 			const currentUserIsAuthorCurrentMr =
-				currentMergeRequest.author.id === user.GitlabProfile.id;
+				currentMergeRequest.author.id === user.gitlab.id;
 
 			if (!isProcessMrAuthor && currentUserIsAuthorCurrentMr) {
 				// Если не указано явным образом обрабатывать автора MR

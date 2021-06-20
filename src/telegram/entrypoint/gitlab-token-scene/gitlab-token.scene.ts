@@ -1,7 +1,6 @@
 import { Scene, SceneEnter, SceneLeave, Command, Hears, TelegrafException } from 'nestjs-telegraf';
-import { getStateValue, message } from '../../../common/utils';
+import { message } from '../../../common/utils';
 import { GitlabService } from '../../../gitlab/gitlab.service';
-import { Role } from '../../../users/users.models';
 import { UsersService } from '../../../users/users.service';
 import { ContextBot } from '../../common/context.interface';
 import { GITLAB_TOKEN_SCENE_ID } from '../constants';
@@ -34,11 +33,13 @@ export class GitlabTokenScene {
 			throw new TelegrafException(`Field 'from' is not defined`);
 		}
 		const token = message(ctx);
-		const isTokenValid = await this.gitlabService.isTokenValid(token);
-		if (isTokenValid) {
+		const gitlabProfile = await this.gitlabService.getUser(token);
+		if (gitlabProfile) {
 			const result = await this.usersService.updateUser(userId, (user) => {
 				user.GitlabProfile.token = token;
 				user.GitlabProfile.isTokenOk = true;
+				user.GitlabProfile.id = gitlabProfile.id;
+				user.GitlabProfile.userName = gitlabProfile.username;
 			});
 
 			if (result) {

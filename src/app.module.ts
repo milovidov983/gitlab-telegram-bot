@@ -10,6 +10,8 @@ import { UserDatabaseModule } from './users/database/user-database.module';
 import { CommandHandlerModule } from './command-handlers/command-handler.module';
 import { ScheduleModule } from './schedule/shedule.module';
 import { GitlabDatabaseModule } from './gitlab/database/gitlab-db.module';
+import { GitlabMergeRequestCollectorModule } from './gitlab/gitlab-mr-collector/gitlab-mr-collector.module';
+import { sessionMiddleware } from './middleware/session.middleware';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { GitlabDatabaseModule } from './gitlab/database/gitlab-db.module';
     TelegrafModule.forRoot({
       token: configService.getBotToken(),
       include: [EntrypointModule],
+      middlewares: [sessionMiddleware],
     }),
     GitlabConnectorModule,
     GitlabModule,
@@ -26,6 +29,7 @@ import { GitlabDatabaseModule } from './gitlab/database/gitlab-db.module';
     UserDatabaseModule,
     UsersModule,
     CommandHandlerModule,
+    GitlabMergeRequestCollectorModule,
   ]
 })
 export class AppModule { }

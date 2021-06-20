@@ -7,6 +7,7 @@ import { GitlabInternalUserModel, MergeRequest, MergeRequestId, MergeRequests } 
 
 @Injectable()
 export class GitlabService {
+
 	constructor(
 		private readonly storage: GitlabDatabaseService,
 		private readonly connector: GitlabConnectorService,
@@ -30,10 +31,20 @@ export class GitlabService {
 		};
 	}
 
+	async isTokenValid(token: string): Promise<boolean> {
+		const user = await this.connector.getUser(token);
+		return !!user;
+	}
+
 	//#region GITLAB USERS
 
-	public async getAllActiveUsers(): Promise<GitlabInternalUserModel[]> {
-		const gitLabUsers: GitlabInternalUserModel[] = await this.connector.getAllUsers();
+	public async getAllActiveUsers(users: User[]): Promise<GitlabInternalUserModel[]> {
+		const tokens = users
+			.filter(x => x.GitlabProfile.isTokenOk)
+			.map(x => x.GitlabProfile.token)
+			.filter(x => !!x);
+
+		const gitLabUsers: GitlabInternalUserModel[] = await this.connector.getUsers(tokens);
 		return gitLabUsers;
 	}
 

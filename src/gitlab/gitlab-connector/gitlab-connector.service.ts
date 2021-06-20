@@ -1,7 +1,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { MergeRequestRole, MergeRequestState } from '../../common/shared.models';
+import { MergeRequestRole, AllMergeRequestState } from '../../common/shared.models';
 import { configService } from '../../config/config.service';
 import { BASE_GITLAB_URL } from '../../config/constants';
 import { User } from '../../users/users.models';
@@ -18,8 +18,10 @@ export class GitlabConnectorService {
 			throw new Error('Init error. Please set the base gitlab url in .env file: ' + BASE_GITLAB_URL);
 		}
 	}
-	async getAllUsers(): Promise<GitlabUser[]> {
-		throw new Error('Method not implemented.');
+
+	async getUsers(tokens: string[]): Promise<GitlabUser[]> {
+		const result = await Promise.all(tokens.map(async x => await this.getUser(x)));
+		return result;
 	}
 
 	async getUser(token: string): Promise<GitlabUser> {
@@ -29,7 +31,7 @@ export class GitlabConnectorService {
 
 	getMergeRequests(
 		user: User,
-		state: MergeRequestState,
+		state: AllMergeRequestState,
 		role: MergeRequestRole
 	): Promise<MergeRequest[]> {
 		const token = user.gitlab?.token;

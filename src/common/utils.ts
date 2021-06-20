@@ -1,4 +1,5 @@
 import { Logger } from "@nestjs/common";
+import { ContextBot } from '../telegram/common/context.interface';
 
 
 export function createErrorLogMessage(message: string, data: any, error: any) {
@@ -22,4 +23,23 @@ export function getPastDateDefault(): Date {
 	var d = new Date();
 	d.setDate(d.getDate() - 5);
 	return d;
+}
+
+
+export function message(ctx: ContextBot): string {
+	const message = (ctx?.update as any)?.message?.text;
+	return message;
+}
+
+export function getStateValue(ctx: ContextBot, prop: string): string {
+	if (ctx.session.__scenes.state) {
+		return (ctx.session.__scenes.state as any)[prop];
+	}
+	return '';
+}
+
+export function clearState(ctx: ContextBot): void {
+	if (ctx.session.__scenes.state) {
+		ctx.session.__scenes.state = {};
+	}
 }

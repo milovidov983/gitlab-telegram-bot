@@ -1,13 +1,14 @@
-import { MergeRequestState } from '../common/shared.models';
+import { AllMergeRequestState, ShortMergeRequestState } from '../common/shared.models';
+import { User } from '../users/users.models';
 
 export type MergeRequests<TValue> = {
-	[key in Exclude<MergeRequestState, 'locked'>]: TValue;
+	[key in ShortMergeRequestState]: TValue;
 };
 export class MergeRequest {
 	id: number;
 	iid: number;
 	project_id: number;
-	state: MergeRequestState;
+	state: AllMergeRequestState;
 	updated_at: Date;
 	author: GitlabInternalUserModel;
 	assignee?: GitlabInternalUserModel;
@@ -32,4 +33,10 @@ export class MergeRequestId {
 	constructor(args: Partial<MergeRequestId>) {
 		Object.assign(this, args);
 	}
+}
+
+export class NotificationRawData {
+	mr: MergeRequest;
+	user: User;
+	state: ShortMergeRequestState;
 }

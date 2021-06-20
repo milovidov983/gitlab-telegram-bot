@@ -21,6 +21,25 @@ export class UsersService {
 		return false;
 	}
 
+	async getAll(): Promise<User[]> {
+		const allUsers = await this.storage.getAll();
+		return allUsers.map(x => new User(x.data));
+	}
+
+	async findActiveGitlabUsers(): Promise<User[]> {
+		const allUsers = await this.storage.getAll();
+
+		return allUsers.filter(x => {
+			const user = new User(x.data);
+
+			return !user.isDeleted
+				&& !user.IsGuest
+				&& user.GitlabProfile.isTokenOk
+				&& user.GitlabProfile.token
+				&& user.Settings.isNotificationOn
+		}).map(x => x.data);
+	}
+
 	async findUserByTelegramId(id: number): Promise<FindUserResult> {
 		try {
 			const userOrNull = await this.storage.getUserById(id);
@@ -54,9 +73,7 @@ export class UsersService {
 		return false;
 	}
 
-
-
-	public async recordCurrentTimeAndSaveUser(user: User): Promise<void> {
+	async recordSyncTimeAndSave(user: User): Promise<void> {
 		await this.updateUser(user.Id, (user) => {
 			user.Operation.updateSyncDate(new Set(['author', 'assignee']));
 		})

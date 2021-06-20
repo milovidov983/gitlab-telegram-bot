@@ -1,4 +1,4 @@
-import { MergeRequestRole, MergeRequestState } from '../common/shared.models';
+import { MergeRequestRole, AllMergeRequestState } from '../common/shared.models';
 import { getPastDateDefault } from '../common/utils';
 
 export type UserStatus = 'stopped' | 'active';
@@ -34,44 +34,33 @@ export class OperationData {
 	}
 }
 
-export class UserSubscriptions {
-	gitlabMergeRequest: MergeRequestState[];
+export class UserSettings {
+	subscribedTo: AllMergeRequestState[] = [];
+	isNotificationOn: boolean = true;
 
-	constructor(arg?: Partial<UserSubscriptions>) {
+	constructor(arg?: Partial<UserSettings>) {
 		Object.assign(this, arg);
 	}
 }
 export class User {
-	telegram: TelegramUser;
+	telegram: TelegramUser = new TelegramUser();
 	get TelegramData(): TelegramUser {
-		if (!this.telegram) {
-			this.telegram = new TelegramUser();
-		}
 		return this.telegram;
 	}
 
-	gitlab: GitlabUserProfile;
+	gitlab: GitlabUserProfile = new GitlabUserProfile();
 	get GitlabProfile(): GitlabUserProfile {
-		if (!this.gitlab) {
-			this.gitlab = new GitlabUserProfile();
-		}
 		return this.gitlab;
 	}
 
-	operation: OperationData;
+	operation: OperationData = new OperationData();
 	get Operation(): OperationData {
-		if (!this.operation) {
-			this.operation = new OperationData();
-		}
 		return this.operation;
 	}
 
-	subscriptions: UserSubscriptions;
-	get Subscriptions(): UserSubscriptions {
-		if (!this.subscriptions) {
-			this.subscriptions = new UserSubscriptions();
-		}
-		return this.subscriptions;
+	settings: UserSettings = new UserSettings();
+	get Settings(): UserSettings {
+		return this.settings;
 	}
 
 	role: Role = 'guest';
@@ -147,6 +136,5 @@ export class GitlabUserProfile {
 
 	constructor(user?: Partial<GitlabUserProfile>) {
 		Object.assign(this, user);
-
 	}
 }

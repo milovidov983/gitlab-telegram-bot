@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ContextBot } from '../common/context.interface';
+import { ContextBot } from '../telegram/common/context.interface';
 import { logError } from '../common/utils';
 import { ErrorMessage, FindUserResult, User } from '../users/users.models';
 import { UsersService } from '../users/users.service';
@@ -49,12 +49,10 @@ export class StartCommandHandler {
 		await this.usersService.create(user);
 	}
 
-	private async getUserIfExists(ctx: ContextBot | undefined): Promise<FindUserResult> {
-		if (ctx?.message?.from?.id) {
-			const user = await this.usersService.findUserByTelegramId(ctx.message.from.id);
-			return user;
-		} else {
-			logError(this.logger, 'Telegram user id not defined', ctx);
-		}
+	private async getUserIfExists(ctx: ContextBot): Promise<FindUserResult> {
+		const userId = ctx.message!.from.id;
+		const user = await this.usersService.findUserByTelegramId(userId);
+		return user;
+
 	}
 }

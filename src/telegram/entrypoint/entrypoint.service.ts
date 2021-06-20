@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { StartCommandHandler } from '../../command-handlers/start.command-handler';
-import { ContextBot } from '../../common/context.interface';
+import { ContextBot } from '../common/context.interface';
 import { MessageCreateError } from '../../command-handlers/errors/message-create-error';
 import { Message } from '../common/common.models';
 

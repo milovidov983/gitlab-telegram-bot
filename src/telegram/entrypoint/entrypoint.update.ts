@@ -1,13 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { Start, Update, InjectBot, Help } from 'nestjs-telegraf';
-import { logError } from 'src/common/utils';
-
+import { logError } from '../../common/utils';
 import { Telegraf } from 'telegraf';
 import { MessageCreateError } from '../../command-handlers/errors/message-create-error';
-import { MessageUserIdIsNotDefinedError } from '../../command-handlers/errors/message-user-id-not-defined';
-import { ContextBot } from '../../common/context.interface';
+import { RequestUserIdIsNotDefinedError } from '../../command-handlers/errors/request-user-id-not-defined';
+import { ContextBot } from '../common/context.interface';
 import { configService } from '../../config/config.service';
-import { ValidateContext } from '../common/common.models';
+import { ValidateContext } from '../decorators/validate-context.decorator';
 import { EntrypointService } from './entrypoint.service';
 
 @Update()
@@ -43,8 +42,8 @@ export class EntrypointUpdate {
 
 
 	private handleErrorAndLog(err: any, message: string, ctx: ContextBot) {
-		const details = this.isProd ? '' : err.message;
-		if (err instanceof MessageUserIdIsNotDefinedError) {
+		const details = this.isProd ? '***' : err.message;
+		if (err instanceof RequestUserIdIsNotDefinedError) {
 			message = 'User id is not defined ' + details;
 		} else if (err instanceof MessageCreateError) {
 			message = 'Create message error ' + details;

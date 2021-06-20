@@ -1,10 +1,8 @@
 import { MergeRequestState } from '../common/shared.models';
 
-
 export type MergeRequests<TValue> = {
 	[key in Exclude<MergeRequestState, 'locked'>]: TValue;
 };
-
 export class MergeRequest {
 	id: number;
 	iid: number;

@@ -8,6 +8,7 @@ import { GitlabConnectorModule } from './gitlab/gitlab-connector/gitlab-connecto
 import { UsersModule } from './users/users.module';
 import { UserDatabaseModule } from './users/database/user-database.module';
 import { CommandHandlerModule } from './command-handlers/command-handler.module';
+import { ScheduleModule } from './schedule/shedule.module';
 
 @Module({
   imports: [
@@ -17,11 +18,12 @@ import { CommandHandlerModule } from './command-handlers/command-handler.module'
       include: [EntrypointModule],
     }),
     GitlabConnectorModule.forRoot({ baseUrl: configService.getGitlabBaseUrl() }),
+    ScheduleModule.forRoot(configService.getUpdateInterval()),
     EntrypointModule,
     UserDatabaseModule,
     GitlabModule,
     UsersModule,
-    CommandHandlerModule
+    CommandHandlerModule,
   ]
 })
 export class AppModule { }

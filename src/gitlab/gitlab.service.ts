@@ -6,4 +6,9 @@ export class GitlabService {
 		// if offline log this
 		throw new Error('Method not implemented.');
 	}
+
+	update(): void{
+		// Get users
+		// 
+	}
 }

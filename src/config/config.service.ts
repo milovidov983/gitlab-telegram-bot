@@ -1,8 +1,7 @@
 
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { BASE_GITLAB_URL, BOT_TOKEN, MODE, POSTGRES_DATABASE, POSTGRES_HOST, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_USER } from './constants';
+import { BASE_GITLAB_URL, BOT_TOKEN, MODE, POSTGRES_DATABASE, POSTGRES_HOST, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_USER, UPDATE_INTERVAL_MS } from './constants';
 
-require('dotenv').config();
 
 class ConfigService {
     constructor(private env: { [k: string]: string | undefined }) { }
@@ -56,10 +55,12 @@ class ConfigService {
 
     public getGitlabBaseUrl(): string {
         const url = this.getValue(BASE_GITLAB_URL, true);
-        console.log('\n\n\n\n');
-        console.log(url);
-        console.log('\n\n\n\n');
         return url!;
+    }
+
+    public getUpdateInterval(): number {
+        const interval = this.getValue(UPDATE_INTERVAL_MS, true);
+        return +interval!;
     }
 }
 

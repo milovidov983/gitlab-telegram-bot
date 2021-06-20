@@ -14,7 +14,7 @@ export class StartCommandHandler {
         let message = ''
         const user = await this.getUserIfExists(ctx);
         if(user){
-            message = this.createGreetingMessage(user.gitlab?.userName);
+            message = this.createGreetingMessage(user.UserName);
         } else {
             message = this.createRegistrationMessage();
             await this.cereateNewUser(ctx);

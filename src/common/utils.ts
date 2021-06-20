@@ -11,8 +11,15 @@ export function createErrorLogMessage(message: string, data: any, error: any) {
 }
 
 
-export function logError(logger: Logger, err: any,  ctx: any | undefined
-	) {
+export function logError(logger: Logger, err: any, ctx: any | undefined
+) {
 	logger.error(err);
 	logger.error(JSON.stringify(ctx));
+}
+
+
+export function getPastDateDefault(): Date {
+	var d = new Date();
+	d.setDate(d.getDate() - 5);
+	return d;
 }

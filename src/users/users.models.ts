@@ -1,12 +1,28 @@
+import { MergeRequestRole, MergeRequestState } from '../common/shared.models';
+import { getPastDateDefault } from '../common/utils';
+
 export type UserStatus = 'stopped' | 'active';
 export type Role = 'guest' | 'user' | 'admin';
-export type GitlabEventType  = 
-	'mergeRequestNew'
-	| 'mergeRequestClosed'
-	| 'mergeRequestReopened';
+export type ErrorMessage = string;
+export type FindUserResult = User | undefined | ErrorMessage;
+
+export class OperationData {
+	syncHistoryByRole: Record<MergeRequestRole, Date>;
+
+	constructor(user?: Partial<OperationData>) {
+		Object.assign(this, user);
+		if (!this.syncHistoryByRole) {
+			this.syncHistoryByRole = {
+				assignee: getPastDateDefault(),
+				author: getPastDateDefault(),
+			};
+		}
+	}
+}
 export class User {
 	telegram: TelegramUser;
 	gitlab?: GitlabUser;
+	operation: OperationData;
 
 	role: Role = 'guest';
 	status: UserStatus = 'active';
@@ -14,56 +30,64 @@ export class User {
 	isDeleted = false;
 	registrationDate: Date = new Date();
 	lastActivity: Date = new Date();
-	invitationSent?: Date;
+	invitationSentAt?: Date;
 
-	get UserName(){
-		return this.gitlab?.userName || 'User_'+this.telegram.id;
+	get Id(): number {
+		return this.telegram.id;
 	}
 
-	get IsGuest() {
-		return this.role ==='guest' || !this.role;
+
+	get UserName(): string {
+		return this.gitlab?.userName ?? 'User_' + this.telegram.id;
 	}
 
-	get InvationRetryInDay(){
-		return 7;
+	get IsGuest(): boolean {
+		switch (this.role) {
+			case 'admin':
+			case 'user':
+				return false;
+			case 'guest':
+				return true;
+			default: return true;
+		}
 	}
 
 	get IsNeedToSendInvitationNow(): boolean {
-		const userActive = !this.isDeleted 
-		&& this.role === 'user'
-		&& this.status === 'active';
+		const userActive =
+			!this.isDeleted
+			&& this.role === 'user'
+			&& this.status === 'active';
 
-		const isNotSent = userActive
-			&& !this.invitationSent;
-
-		if(isNotSent){
-			return true;
-		}
-
-		const isRetry = userActive
-		&& !this.gitlab
-		&& this.invitationSent
-		&& this.InvationRetryInDay < this.getLastNotificationInDays() 
-
-		if(isRetry || isRetry === undefined){
-			return true;
-		}
-		return false;
+		return userActive && this.invitationSentAt === undefined;
 	}
 
-	private getLastNotificationInDays() : number {
-		if(!this.invitationSent){
-			return 0;
-		}
-		const invitationSent = this.invitationSent.getTime();
-		const now = (new Date()).getTime() ;
 
-		const diff = Math.abs(now - invitationSent);
-		return Math.ceil(diff / (1000 * 3600 * 24));
-	}
-
-	constructor(args?: Partial<User>){
+	constructor(args?: Partial<User>) {
 		Object.assign(this, args);
+	}
+
+	getLastSyncDateByRole(role: MergeRequestRole): Date {
+		if (this.operation && this.operation.syncHistoryByRole) {
+			return new Date(this.operation.syncHistoryByRole[role]);
+		}
+		return getPastDateDefault();
+	}
+
+	setRole(role: Role): void {
+		if (this.role === 'guest' && role !== 'guest') {
+			this.invitationSentAt = undefined;
+		}
+		this.role = role;
+	}
+
+	updateSyncDate(forMergeRequestRoles: Set<MergeRequestRole>): void {
+		if (!this.operation) {
+			this.operation = new OperationData();
+		}
+		const operation = this.operation;
+		forMergeRequestRoles.forEach(role => {
+			operation.syncHistoryByRole[role] = new Date();
+		});
 	}
 }
 
@@ -74,16 +98,17 @@ export class TelegramUser {
 	userName: string | undefined;
 }
 
-export class GitlabStats {
-	totalCreatedMr  = 0;
-}
-
 export class GitlabUser {
 	userName: string;
 	token: string;
 	id: number;
 	isTokenOk = false;
-	stats: GitlabStats = new GitlabStats();
 
-	subscribedOnEvents: GitlabEventType[];
+	subscribedOnEvents: MergeRequestState[];
+
+
+	constructor(user: Partial<GitlabUser>) {
+		Object.assign(this, user);
+
+	}
 }

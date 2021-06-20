@@ -1,7 +1,8 @@
 
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { UserEntity } from '../users/database/user.entity';
 import { BASE_GITLAB_URL, BOT_TOKEN, MODE, POSTGRES_DATABASE, POSTGRES_HOST, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_USER, UPDATE_INTERVAL_MS } from './constants';
-
+require('dotenv').config();
 
 class ConfigService {
     constructor(private env: { [k: string]: string | undefined }) { }
@@ -39,7 +40,8 @@ class ConfigService {
             password: this.getValue('POSTGRES_PASSWORD'),
             database: this.getValue('POSTGRES_DATABASE'),
 
-            entities: ['**/*.entity{.ts,.js}'],
+            //entities: ['**/*.entity{.ts,.js}'],
+            entities: [UserEntity],
 
 
 

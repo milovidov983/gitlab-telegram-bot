@@ -4,8 +4,8 @@ import { GitlabConnectorModule } from './gitlab-connector/gitlab-connector.modul
 import { GitlabService } from './gitlab.service';
 
 @Module({
-  imports: [GitlabConnectorModule, GitlabDatabaseModule],
   providers: [GitlabService],
-  exports: [GitlabService]
+  exports: [GitlabService],
+  imports: [GitlabDatabaseModule, GitlabConnectorModule],
 })
 export class GitlabModule { }

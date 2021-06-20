@@ -2,23 +2,22 @@
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { MergeRequestRole, MergeRequestState } from '../../common/shared.models';
+import { configService } from '../../config/config.service';
 import { BASE_GITLAB_URL } from '../../config/constants';
 import { User } from '../../users/users.models';
 import { MergeRequest } from '../gitlab.models';
-import { GITLAB_CONNECTOR_OPTIONS } from './constants';
-import { GitlabConnectorModuleOptions, GitlabUser } from './gitlab-connector.models';
+import { GitlabUser } from './gitlab-connector.models';
 
 @Injectable()
 export class GitlabConnectorService {
 	private readonly baseUrl: string;
 
-	constructor(@Inject(GITLAB_CONNECTOR_OPTIONS) options: GitlabConnectorModuleOptions) {
-		this.baseUrl = 'https://' + options.baseUrl;
+	constructor() {
+		this.baseUrl = 'https://' + configService.getGitlabBaseUrl();
 		if (!this.baseUrl) {
 			throw new Error('Init error. Please set the base gitlab url in .env file: ' + BASE_GITLAB_URL);
 		}
 	}
-
 	async getAllUsers(): Promise<GitlabUser[]> {
 		throw new Error('Method not implemented.');
 	}

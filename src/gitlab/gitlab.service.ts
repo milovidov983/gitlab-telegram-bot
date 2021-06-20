@@ -3,13 +3,13 @@ import { User } from '../users/users.models';
 import { GitlabDatabaseService } from './database/gitlab-db.service';
 import { GitlabMergeRequestEntity } from './database/gitlab-mr.entity';
 import { GitlabConnectorService } from './gitlab-connector/gitlab-connector.service';
-import { GitlabInternalUserModel as GitlabUser, MergeRequest, MergeRequestId, MergeRequests } from './gitlab.models';
+import { GitlabInternalUserModel, MergeRequest, MergeRequestId, MergeRequests } from './gitlab.models';
 
 @Injectable()
 export class GitlabService {
 	constructor(
-		private connector: GitlabConnectorService,
-		private storage: GitlabDatabaseService
+		private readonly storage: GitlabDatabaseService,
+		private readonly connector: GitlabConnectorService,
 	) { }
 
 	public async getUpdatedMergeRequests(user: User): Promise<MergeRequests<MergeRequest[]>> {
@@ -32,8 +32,8 @@ export class GitlabService {
 
 	//#region GITLAB USERS
 
-	public async getAllActiveUsers(): Promise<GitlabUser[]> {
-		const gitLabUsers: GitlabUser[] = await this.connector.getAllUsers();
+	public async getAllActiveUsers(): Promise<GitlabInternalUserModel[]> {
+		const gitLabUsers: GitlabInternalUserModel[] = await this.connector.getAllUsers();
 		return gitLabUsers;
 	}
 
@@ -75,5 +75,5 @@ export class GitlabService {
 		);
 		return result;
 	}
-	//#endregion
+	//#endregion 
 }

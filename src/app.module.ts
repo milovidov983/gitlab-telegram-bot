@@ -18,14 +18,14 @@ import { GitlabDatabaseModule } from './gitlab/database/gitlab-db.module';
       token: configService.getBotToken(),
       include: [EntrypointModule],
     }),
-    GitlabConnectorModule.forRoot({ baseUrl: configService.getGitlabBaseUrl() }),
+    GitlabConnectorModule,
+    GitlabModule,
+    GitlabDatabaseModule,
     ScheduleModule.forRoot(configService.getUpdateInterval()),
     EntrypointModule,
     UserDatabaseModule,
-    GitlabModule,
     UsersModule,
     CommandHandlerModule,
-    GitlabDatabaseModule
   ]
 })
 export class AppModule { }

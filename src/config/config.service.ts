@@ -1,5 +1,6 @@
 
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { GitlabMergeRequestEntity } from '../gitlab/database/gitlab-mr.entity';
 import { UserEntity } from '../users/database/user.entity';
 import { BASE_GITLAB_URL, BOT_TOKEN, MODE, POSTGRES_DATABASE, POSTGRES_HOST, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_USER, UPDATE_INTERVAL_MS } from './constants';
 require('dotenv').config();
@@ -41,7 +42,7 @@ class ConfigService {
             database: this.getValue('POSTGRES_DATABASE'),
 
             //entities: ['**/*.entity{.ts,.js}'],
-            entities: [UserEntity],
+            entities: [UserEntity, GitlabMergeRequestEntity],
 
 
 
@@ -72,6 +73,9 @@ const configService = new ConfigService(process.env).ensureValues([
     POSTGRES_USER,
     POSTGRES_PASSWORD,
     POSTGRES_DATABASE,
+    BASE_GITLAB_URL,
+    BOT_TOKEN,
+    MODE
 ]);
 
 export { configService };

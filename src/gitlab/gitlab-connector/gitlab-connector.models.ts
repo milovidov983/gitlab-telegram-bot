@@ -1,7 +1,3 @@
-export interface GitlabConnectorModuleOptions {
-	baseUrl: string;
-}
-
 export interface GitlabUser {
 	id: number;
 	name: string;

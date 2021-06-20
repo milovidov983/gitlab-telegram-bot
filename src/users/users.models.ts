@@ -18,15 +18,57 @@ export class OperationData {
 			};
 		}
 	}
+
+	updateSyncDate(forMergeRequestRoles: Set<MergeRequestRole>): void {
+		const history = this.syncHistoryByRole;
+		forMergeRequestRoles.forEach(role => {
+			history[role] = new Date();
+		});
+	}
+}
+
+export class UserSubscriptions {
+	gitlabMergeRequest: MergeRequestState[];
+
+	constructor(arg?: Partial<UserSubscriptions>) {
+		Object.assign(this, arg);
+	}
 }
 export class User {
 	telegram: TelegramUser;
-	gitlab?: GitlabUser;
+	get TelegramData(): TelegramUser {
+		if (!this.telegram) {
+			this.telegram = new TelegramUser();
+		}
+		return this.telegram;
+	}
+
+	gitlab: GitlabUserProfile;
+	get GitlabProfile(): GitlabUserProfile {
+		if (!this.gitlab) {
+			this.gitlab = new GitlabUserProfile();
+		}
+		return this.gitlab;
+	}
+
 	operation: OperationData;
+	get Operation(): OperationData {
+		if (!this.operation) {
+			this.operation = new OperationData();
+		}
+		return this.operation;
+	}
+
+	subscriptions: UserSubscriptions;
+	get Subscriptions(): UserSubscriptions {
+		if (!this.subscriptions) {
+			this.subscriptions = new UserSubscriptions();
+		}
+		return this.subscriptions;
+	}
 
 	role: Role = 'guest';
 	status: UserStatus = 'active';
-
 	isDeleted = false;
 	registrationDate: Date = new Date();
 	lastActivity: Date = new Date();
@@ -35,7 +77,6 @@ export class User {
 	get Id(): number {
 		return this.telegram.id;
 	}
-
 
 	get UserName(): string {
 		return this.gitlab?.userName ?? 'User_' + this.telegram.id;
@@ -61,10 +102,10 @@ export class User {
 		return userActive && this.invitationSentAt === undefined;
 	}
 
-
 	constructor(args?: Partial<User>) {
 		Object.assign(this, args);
 	}
+
 
 	getLastSyncDateByRole(role: MergeRequestRole): Date {
 		if (this.operation && this.operation.syncHistoryByRole) {
@@ -73,21 +114,19 @@ export class User {
 		return getPastDateDefault();
 	}
 
-	setRole(role: Role): void {
-		if (this.role === 'guest' && role !== 'guest') {
-			this.invitationSentAt = undefined;
+	setRole(newRole: Role): void {
+		const currentRole = this.role;
+		if (currentRole === 'guest' && newRole === 'user') {
+			this.activateInvention();
 		}
-		this.role = role;
+		this.role = newRole;
 	}
 
-	updateSyncDate(forMergeRequestRoles: Set<MergeRequestRole>): void {
-		if (!this.operation) {
-			this.operation = new OperationData();
-		}
-		const operation = this.operation;
-		forMergeRequestRoles.forEach(role => {
-			operation.syncHistoryByRole[role] = new Date();
-		});
+
+
+
+	private activateInvention() {
+		this.invitationSentAt = undefined;
 	}
 }
 
@@ -96,18 +135,21 @@ export class TelegramUser {
 	chatId: number | undefined;
 	firstName: string | undefined;
 	userName: string | undefined;
+
+
+	constructor(param?: Partial<TelegramUser>) {
+		Object.assign(this, param);
+
+	}
 }
 
-export class GitlabUser {
+export class GitlabUserProfile {
 	userName: string;
 	token: string;
 	id: number;
 	isTokenOk = false;
 
-	subscribedOnEvents: MergeRequestState[];
-
-
-	constructor(user: Partial<GitlabUser>) {
+	constructor(user?: Partial<GitlabUserProfile>) {
 		Object.assign(this, user);
 
 	}

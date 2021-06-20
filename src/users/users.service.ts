@@ -58,7 +58,7 @@ export class UsersService {
 
 	public async recordCurrentTimeAndSaveUser(user: User): Promise<void> {
 		await this.updateUser(user.Id, (user) => {
-			user.updateSyncDate(new Set(['author', 'assignee']));
+			user.Operation.updateSyncDate(new Set(['author', 'assignee']));
 		})
 	}
 

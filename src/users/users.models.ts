@@ -25,6 +25,13 @@ export class OperationData {
 			history[role] = new Date();
 		});
 	}
+
+	getLastSyncDateByRole(role: MergeRequestRole): Date {
+		if (this.syncHistoryByRole) {
+			return new Date(this.syncHistoryByRole[role]);
+		}
+		return getPastDateDefault();
+	}
 }
 
 export class UserSubscriptions {
@@ -106,14 +113,6 @@ export class User {
 		Object.assign(this, args);
 	}
 
-
-	getLastSyncDateByRole(role: MergeRequestRole): Date {
-		if (this.operation && this.operation.syncHistoryByRole) {
-			return new Date(this.operation.syncHistoryByRole[role]);
-		}
-		return getPastDateDefault();
-	}
-
 	setRole(newRole: Role): void {
 		const currentRole = this.role;
 		if (currentRole === 'guest' && newRole === 'user') {
@@ -121,9 +120,6 @@ export class User {
 		}
 		this.role = newRole;
 	}
-
-
-
 
 	private activateInvention() {
 		this.invitationSentAt = undefined;

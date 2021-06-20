@@ -24,7 +24,8 @@ export class UsersService {
 	async findUserByTelegramId(id: number): Promise<FindUserResult> {
 		try {
 			const userOrNull = await this.storage.getUserById(id);
-			return userOrNull ? userOrNull.data : undefined;
+			const result = userOrNull ? new User(userOrNull.data) : undefined;
+			return result;
 		} catch (err) {
 			const logMessage = createErrorLogMessage(`Error to find user`, { id }, err)
 			this.logger.error(logMessage);
@@ -37,7 +38,6 @@ export class UsersService {
 			user.setRole(role);
 		});
 	}
-
 
 	async updateUser(id: number, modifFunc: (u: User) => void): Promise<boolean> {
 		try {

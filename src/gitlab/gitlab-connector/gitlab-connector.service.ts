@@ -36,7 +36,7 @@ export class GitlabConnectorService {
 		const userId = user.gitlab?.id;
 
 		const userRole = role === 'author' ? 'author_id=' : 'assignee_id=';
-		const dateQuery = user.getLastSyncDateByRole(role);
+		const dateQuery = user.Operation.getLastSyncDateByRole(role);
 
 		const url =
 			`${this.baseUrl}/api/v4/merge_requests` +

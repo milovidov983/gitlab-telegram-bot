@@ -1,5 +1,5 @@
-import { Logger } from '@nestjs/common';
-import { Start, Update, InjectBot, Help } from 'nestjs-telegraf';
+import { Logger, UseGuards } from '@nestjs/common';
+import { Start, Update, InjectBot, Help, Command } from 'nestjs-telegraf';
 import { logError } from '../../common/utils';
 import { Telegraf } from 'telegraf';
 import { MessageCreateError } from '../../command-handlers/errors/message-create-error';
@@ -8,6 +8,7 @@ import { ContextBot } from '../common/context.interface';
 import { configService } from '../../config/config.service';
 import { ValidateContext } from '../decorators/validate-context.decorator';
 import { EntrypointService } from './entrypoint.service';
+import { AdminGuard } from '../../common/admin.guard';
 
 @Update()
 export class EntrypointUpdate {
@@ -40,19 +41,31 @@ export class EntrypointUpdate {
 		await ctx.reply(msg);
 	}
 
+	@Command('e')
+	@UseGuards(AdminGuard)
+	async editUserCommand(@ValidateContext() ctx: ContextBot) {
+		await ctx.reply('edit user');
+	}
+
+
 
 	private handleErrorAndLog(err: any, message: string, ctx: ContextBot) {
-		const details = this.isProd ? '***' : err.message;
-		if (err instanceof RequestUserIdIsNotDefinedError) {
-			message = 'User id is not defined ' + details;
-		} else if (err instanceof MessageCreateError) {
-			message = 'Create message error ' + details;
-		} else if (err instanceof Error) {
-			message = 'Unhandled exeption ' + details;
-		} else {
-			throw err;
+		try {
+			const details = this.isProd ? '***' : err.message;
+			if (err instanceof RequestUserIdIsNotDefinedError) {
+				message = 'User id is not defined ' + details;
+			} else if (err instanceof MessageCreateError) {
+				message = 'Create message error ' + details;
+			} else if (err instanceof Error) {
+				message = 'Unhandled exeption ' + details;
+			} else {
+				throw err;
+			}
+			logError(this.logger, err, ctx);
+			return message;
+		} catch (e) {
+			console.error(e);
 		}
-		logError(this.logger, err, ctx);
 		return message;
 	}
 }

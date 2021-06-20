@@ -2,32 +2,36 @@ export type UserStatus = 'stopped' | 'active';
 export type Role = 'guest' | 'user' | 'admin';
 
 export class User {
-  telegram: TelegramUser;
-  gitlab?: GitlabUser;
+	telegram: TelegramUser;
+	gitlab?: GitlabUser;
 
-  role: Role = 'guest'
-  status: UserStatus = 'active';
+	role: Role = 'guest';
+	status: UserStatus = 'active';
 
-  isDeleted: boolean = false;
-  registrationDate: Date = new Date();
-  lastActivity: Date = new Date();
+	isDeleted = false;
+	registrationDate: Date = new Date();
+	lastActivity: Date = new Date();
+
+	get isTokenOk() {
+		return this.gitlab?.isTokenOk ?? false;
+	}
 }
 
 export class TelegramUser {
-  id: number;
-  chatId: number | undefined;
-  firstName: string | undefined;
-  userName: string | undefined;
+	id: number;
+	chatId: number | undefined;
+	firstName: string | undefined;
+	userName: string | undefined;
 }
 
 export class GitlabStats {
-  totalCreatedMr: number = 0;
+	totalCreatedMr  = 0;
 }
 
 export class GitlabUser {
-  userName: string;
-  token: string;
-  id: number;
-
-  stats: GitlabStats = new GitlabStats();
+	userName: string;
+	token: string;
+	id: number;
+	isTokenOk = false;
+	stats: GitlabStats = new GitlabStats();
 }

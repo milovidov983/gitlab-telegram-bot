@@ -7,6 +7,7 @@ import { GitlabModule } from './gitlab/gitlab.module';
 import { GitlabConnectorModule } from './gitlab/gitlab-connector/gitlab-connector.module';
 import { UsersModule } from './users/users.module';
 import { UserDatabaseModule } from './users/database/user-database.module';
+import { CommandHandlerModule } from './command-handlers/command-handler.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserDatabaseModule } from './users/database/user-database.module';
     UserDatabaseModule,
     GitlabModule,
     UsersModule,
+    CommandHandlerModule
   ]
 })
 export class AppModule { }
